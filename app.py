@@ -1,17 +1,22 @@
 from flask import Flask
-import random
+import sqlite3
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return """
+    con = sqlite3.connect('data.db')
+    cursor = con.cursor()
+    cursor.execute('SELECT * FROM topics')
+    rows = cursor.fetchall()
+    liTag = ''
+    for row in rows:
+        liTag = liTag + f'<li><a href="/read/{row[0]}">{row[1]}</a></li>'
+    return f"""
     <html>
     <body>
             <h1><a href="/index.html">web</a></h1>
             <ul>
-                <li><a href="/1.html">html</a></li>
-                <li><a href="/2.html">css</a></li>
-                <li><a href="/3.html">js</a></li>
+                {liTag}
             </ul>
             <h2>Welcome</h2>
             Hello, WEB
@@ -22,7 +27,28 @@ def index():
 @app.route("/read/", defaults={'id': None})
 @app.route("/read/<id>/")
 def read(id):
-    return "Read"
+    con = sqlite3.connect('data.db')
+    cursor = con.cursor()
+    cursor.execute('SELECT * FROM topics')
+    rows = cursor.fetchall()
+    liTag = ''
+    for row in rows:
+        liTag = liTag + f'<li><a href="/read/{row[0]}">{row[1]}</a></li>'
+
+    cursor.execute('SELECT * FROM topics WHERE id = ?', (id,))
+    topic = cursor.fetchone()
+    return f"""
+    <html>
+    <body>
+            <h1><a href="/index.html">web</a></h1>
+            <ul>
+                {liTag}
+            </ul>
+            <h2>{topic[1]}</h2>
+            {topic[2]}
+        </body>
+    </html>
+    """
 
 @app.route('/create/')
 def create():
