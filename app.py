@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, redirect
 import sqlite3
 app = Flask(__name__)
 
@@ -59,6 +59,17 @@ def read(id):
     </html>
     """
 
+@app.route('/create_process', methods=['POST'])
+def create_process():
+    con = sqlite3.connect('data.db')
+    cursor = con.cursor()    
+    title = request.form.get('title')
+    body = request.form.get('body')
+    sql = 'INSERT INTO topics (title, body) VALUES(?, ?)'
+    cursor.execute(sql, [title, body])
+    con.commit()
+    return redirect(f'/read/{cursor.lastrowid}')
+
 @app.route('/create/')
 def create():
     con = sqlite3.connect('data.db')
@@ -76,7 +87,7 @@ def create():
                 {liTag}
             </ul>
             
-            <form action="/create_precess" method="post">
+            <form action="/create_process" method="post">
                 <p><input type="text" placeholder="title" name="title"></p>
                 <p><input type="text" placeholder="body" name="body"></p>
                 <p><input type="submit" value="생성"></p>
