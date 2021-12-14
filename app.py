@@ -6,12 +6,14 @@ app = Flask(__name__)
 def index():
     return "Home"
 
-@app.route("/read/1/")
-def read():
+@app.route("/read/", defaults={'id': None})
+@app.route("/read/<id>/")
+def read(id):
     return "Read"
 
-@app.route("/read/2/")
-def read2():
-    return "Read2"
+@app.route('/create/')
+def create():
+    return 'Create'
+
 
 app.run(debug=True,host="0.0.0.0",port="8000")
